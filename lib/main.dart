@@ -1,6 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:simple_weather/bloc/theme_cubit/theme_cubit.dart';
+import 'package:simple_weather/bloc/weather_cubit/weather_cubit.dart';
+import 'package:simple_weather/repositories/auth_repo.dart';
+import 'package:simple_weather/repositories/dio_repo.dart';
+import 'package:simple_weather/repositories/local_repo.dart';
+import 'package:simple_weather/repositories/stats_repo.dart';
+import 'package:simple_weather/services/di/di.dart';
+import 'package:simple_weather/services/routes/app_routes.dart';
+import 'package:simple_weather/theme/theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env');
+  await setupDI();
   runApp(const MyApp());
 }
 
@@ -8,58 +22,43 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: getIt<ThemeRepo>()),
+        RepositoryProvider.value(value: getIt<CityRepo>()),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => ThemeCubit(context.read<ThemeRepo>()),
+            
+          ),
+          BlocProvider(
+            lazy: false,
+            create: (context) => WeatherCubit(
+              weatherRepo: getIt<WeatherRepo>(),
+              geoRepo: getIt<GeoRepo>(),
+              cityRepo: getIt<CityRepo>(),
+              authRepo: getIt<AuthRepo>(),
+              statsRepo: getIt<StatsRepo>(),
+            )..init(),
+          ),
+        ],
+        child: BlocBuilder<ThemeCubit, ThemeState>(
+          builder: (context, state) {
+            return MaterialApp.router(
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: state.mode == ThemeModeEnum.system
+                  ? ThemeMode.system
+                  : state.mode == ThemeModeEnum.dark
+                  ? ThemeMode.dark
+                  : ThemeMode.light,
+              debugShowCheckedModeBanner: false,
+              routerConfig: router,
+            );
+          },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
