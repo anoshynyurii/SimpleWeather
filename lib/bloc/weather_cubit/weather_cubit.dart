@@ -177,20 +177,30 @@ class WeatherCubit extends Cubit<WeatherState> {
 
     try {
       final stats = await statsRepo.getStats(id);
-      final savedCity = cityRepo.getSavedCity();
-
-      if (savedCity != null) {
-        await fetchWeather(savedCity);
+      final s = state;
+      if (s is WeatherLoaded) {
+        emit(s.copyWith(telegramId: id, stats: stats));
       } else {
         emit(
-          WeatherInitial(
-            telegramId: id,
-            stats: stats,
-            isInitLoading: false,
-          ),
+          WeatherInitial(telegramId: id, stats: stats, isInitLoading: false),
         );
+        final savedCity = cityRepo.getSavedCity();
+        if (savedCity != null) {
+          await fetchWeather(savedCity);
+        }
       }
-    } catch (_) {}
+    } catch (e) {
+      final s = state;
+      if (s is WeatherLoaded) {
+        emit(s.copyWith(telegramId: id));
+      } else {
+        emit(WeatherInitial(telegramId: id, isInitLoading: false));
+        final savedCity = cityRepo.getSavedCity();
+        if (savedCity != null) {
+          await fetchWeather(savedCity);
+        }
+      }
+    }
   }
 
   Future<String?> sendRating(int rating) async {

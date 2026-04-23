@@ -61,6 +61,8 @@ class _AuthWidgetState extends State<AuthWidget> {
                         _inputId,
                       );
 
+                      if (!mounted) return;
+
                       setState(() => _isLoading = false);
                     },
               child: _isLoading
