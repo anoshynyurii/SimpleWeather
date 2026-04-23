@@ -20,55 +20,63 @@ class HomePage extends StatelessWidget {
             final cubit = context.read<WeatherCubit>();
             final currentResults = state.searchResults;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  SearchField(
-                    value: state is WeatherLoaded
-                        ? state.selectedCity.name
-                        : '',
-                    onChanged: cubit.onSearchChanged,
-                    onClear: () {
-                      cubit.onSearchChanged('');
-                    },
-                  ),
-
-                  if (currentResults.isNotEmpty)
-                    SearchResultsList(
-                      cities: currentResults,
-                      onSelect: (city) {
-                        FocusScope.of(context).unfocus();
-                        context.read<WeatherCubit>().fetchWeather(city);
-                        context.read<WeatherCubit>().onSearchChanged('');
-                        
+            return RefreshIndicator(
+              onRefresh: () async {
+                if (state is WeatherLoaded) {
+                  await cubit.fetchWeather(state.selectedCity);
+                }
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    SearchField(
+                      value: state is WeatherLoaded
+                          ? state.selectedCity.name
+                          : '',
+                      onChanged: cubit.onSearchChanged,
+                      onClear: () {
+                        cubit.onSearchChanged('');
                       },
                     ),
-
-                  const SizedBox(height: 24),
-
-                  if (state is WeatherLoading)
-                    const Center(child: CircularProgressIndicator())
-                  else if (state is WeatherLoaded)
-                    WeatherContent(state: state)
-                  else if (state is WeatherError)
-                  Center(
-                      child: Text(
-                        state.message,
-                        style: const TextStyle(color: Colors.red),
+              
+                    if (currentResults.isNotEmpty)
+                      SearchResultsList(
+                        cities: currentResults,
+                        onSelect: (city) {
+                          FocusScope.of(context).unfocus();
+                          context.read<WeatherCubit>().fetchWeather(city);
+                          context.read<WeatherCubit>().onSearchChanged('');
+                          
+                        },
                       ),
-                    )
-                  else
-                    const Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 100),
-                        child: Text(maxLines: 1,'Будь ласка, оберіть місто 🇺🇦', style: TextStyle(
-                          fontSize: 20,
-                          overflow: TextOverflow.ellipsis,
-                        ),),
+              
+                    const SizedBox(height: 24),
+              
+                    if (state is WeatherLoading)
+                      const Center(child: CircularProgressIndicator())
+                    else if (state is WeatherLoaded)
+                      WeatherContent(state: state)
+                    else if (state is WeatherError)
+                    Center(
+                        child: Text(
+                          state.message,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      )
+                    else
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 100),
+                          child: Text(maxLines: 1,'Будь ласка, оберіть місто 🇺🇦', style: TextStyle(
+                            fontSize: 20,
+                            overflow: TextOverflow.ellipsis,
+                          ),),
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             );
           },

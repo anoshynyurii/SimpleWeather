@@ -22,10 +22,8 @@ class WeatherToday extends StatelessWidget {
 
     int currentIndex = hourly.time.indexWhere((timeStr) {
       final time = DateTime.parse(timeStr);
-      return time.year == now.year &&
-          time.month == now.month &&
-          time.day == now.day &&
-          time.hour == now.hour;
+      final currentHourStart = DateTime(now.year, now.month, now.day, now.hour);
+      return !time.isBefore(currentHourStart);
     });
 
     if (currentIndex == -1) {
