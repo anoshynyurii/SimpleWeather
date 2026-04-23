@@ -18,11 +18,26 @@ class WeatherToday extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hourly = weather.hourly;
+    final now = DateTime.now();
 
-    final currentTemp = hourly.temp2m.isNotEmpty ? hourly.temp2m[0] : 0.0;
-    final currentWmo = hourly.wmo.isNotEmpty ? hourly.wmo[0] : 0;
+    int currentIndex = hourly.time.indexWhere((timeStr) {
+      final time = DateTime.parse(timeStr);
+      return time.year == now.year &&
+          time.month == now.month &&
+          time.day == now.day &&
+          time.hour == now.hour;
+    });
+
+    if (currentIndex == -1) {
+      currentIndex = 0;
+    }
+
+    final currentTemp = hourly.temp2m.isNotEmpty
+        ? hourly.temp2m[currentIndex]
+        : 0.0;
+    final currentWmo = hourly.wmo.isNotEmpty ? hourly.wmo[currentIndex] : 0;
     final currentWind = hourly.windSpeed10m.isNotEmpty
-        ? hourly.windSpeed10m[0]
+        ? hourly.windSpeed10m[currentIndex]
         : 0.0;
 
     final int limit = math.min(24, hourly.time.length);

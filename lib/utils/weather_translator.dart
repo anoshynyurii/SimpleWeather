@@ -50,7 +50,7 @@ class WeatherTranslator {
       return "${weatherStatus == 80 ? "Слабкі" : "Сильні"} Дощові зливи";
     }
     if (weatherStatus == 85 || weatherStatus == 86) {
-      return "${weatherStatus == 80 ? "Слабкі" : "Сильні"} Снігові зливи";
+      return "${weatherStatus == 85 ? "Слабкі" : "Сильні"} Снігові зливи";
     }
     if (weatherStatus == 95 || weatherStatus == 96 || weatherStatus == 99) {
       return 'Гроза';
