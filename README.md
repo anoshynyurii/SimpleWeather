@@ -1,17 +1,29 @@
-# simple_weather
+# 🌤 SimpleWeather
 
-A new Flutter project.
+**SimpleWeather** — прогноз погоди зі статистикою для перевірки його точності. 
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## ✨ Особливості додатка
 
-A few resources to get you started if this is your first Flutter project:
+* **Telegram-бот (@SimpleWeatherStats_bot):** * Допомагає дізнатися ваш ID для того, щоб користуватися статистикою та отримувати повідомлення.
+    * Надсилає щоденні нагадування о 19:00, щоб ви не забули поставити оцінку.
+    * Має захист: доступ до бота лише за секретним кодом від автора.
+* **Розумна статистика:** Всі ваші оцінки миттєво потрапляють у Google Таблицю через спеціальний скрипт. Це дає можливість бачити в застосунку, наскільки прогноз точний.
+* **PDF-звіт:** В Android-версії можна завантажити детальний прогноз на тиждень одним файлом.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🛠 Як це працює (технічно)?
+
+* **Frontend:** Створено на **Flutter** (працює як на Android, так і в браузері).
+* **Backend:** Використовується **Google Apps Script** + **Google Sheets**.
+
+---
+
+## 🚀 Як користуватися?
+
+1. Напишіть нашому боту в Telegram та введіть секретний код.
+2. Отримайте свій ID у бота.
+3. Введіть цей ID у додатку в розділі "Статистика".
+4. Користуйтеся додатком та допомагайте робити прогноз кращим, ставлячи оцінки ввечері!
