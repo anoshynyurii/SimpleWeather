@@ -18,14 +18,15 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Create .env file
-        run: echo "SCRIPT_URL=${{ secrets.SCRIPT_URL }}" > .env
+      - name: Create config.json file
+        run: |
+          echo '{ "SCRIPT_URL": "${{ secrets.SCRIPT_URL }}" }' > config.json
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Web
-        run: flutter build web --release --base-href /SimpleWeather/
+        run: flutter build web --release --base-href /SimpleWeather/ --dart-define-from-file=config.json
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

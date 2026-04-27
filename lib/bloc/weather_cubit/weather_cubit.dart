@@ -28,7 +28,7 @@ class WeatherCubit extends Cubit<WeatherState> {
     emit(const WeatherLoading(isInitLoading: true));
 
     final savedCity = cityRepo.getSavedCity();
-    final tId = await authRepo.getTelegramId();
+    final tId = authRepo.getTelegramId();
 
     StatsModel? stats;
 
@@ -170,13 +170,13 @@ class WeatherCubit extends Cubit<WeatherState> {
     }
   }
 
-  Future<void> saveTelegramId(String id) async {
-    if (id.isEmpty) return;
-
-    await authRepo.saveTelegramId(id);
+  Future<String?> saveTelegramId(String id) async {
+    if (id.isEmpty) return 'Введіть ID';
 
     try {
       final stats = await statsRepo.getStats(id);
+      authRepo.saveTelegramId(id);
+
       final s = state;
       if (s is WeatherLoaded) {
         emit(s.copyWith(telegramId: id, stats: stats));
@@ -189,17 +189,10 @@ class WeatherCubit extends Cubit<WeatherState> {
           await fetchWeather(savedCity);
         }
       }
+      return null; 
     } catch (e) {
-      final s = state;
-      if (s is WeatherLoaded) {
-        emit(s.copyWith(telegramId: id));
-      } else {
-        emit(WeatherInitial(telegramId: id, isInitLoading: false));
-        final savedCity = cityRepo.getSavedCity();
-        if (savedCity != null) {
-          await fetchWeather(savedCity);
-        }
-      }
+      authRepo.saveTelegramId(''); 
+      return 'Помилка перевірки ID. Перевірте інтернет або правильність ID.';
     }
   }
 
@@ -210,7 +203,7 @@ class WeatherCubit extends Cubit<WeatherState> {
       return 'Помилка. Спробуйте пізніше.';
     }
 
-    final canRate = await authRepo.canRateToday();
+    final canRate = authRepo.canRateToday();
     if (!canRate) {
       return 'Ви вже залишали оцінку сьогодні! Дякуємо 🌤';
     }
@@ -228,7 +221,7 @@ class WeatherCubit extends Cubit<WeatherState> {
         );
       } catch (_) {
       }
-      await authRepo.saveLastRatingDate();
+      authRepo.saveLastRatingDate();
       final updatedStats = await statsRepo.getStats(s.telegramId!);
       emit(
         s.copyWith(
@@ -247,7 +240,7 @@ class WeatherCubit extends Cubit<WeatherState> {
   }
 
   Future<void> logout() async {
-    await authRepo.saveTelegramId('');
+    authRepo.saveTelegramId('');
     emit(const WeatherInitial(isInitLoading: false));
   }
 }

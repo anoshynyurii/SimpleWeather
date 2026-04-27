@@ -1,7 +1,7 @@
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_weather/models/city_model.dart';
+import 'package:simple_weather/models/weather_model.dart';
 import 'package:simple_weather/theme/theme.dart';
 
 class ThemeRepo {
@@ -29,12 +29,13 @@ class ThemeRepo {
 
 class CityRepo {
   static const String _cityKey = 'selected_city_data';
+  static const String _weatherKey = 'cached_weather_data';
   late final SharedPreferencesWithCache _prefs;
 
   Future<void> init() async {
     _prefs = await SharedPreferencesWithCache.create(
       cacheOptions: const SharedPreferencesWithCacheOptions(
-        allowList: {_cityKey},
+        allowList: {_cityKey, _weatherKey},
       ),
     );
   }
@@ -47,5 +48,15 @@ class CityRepo {
     final data = _prefs.getString(_cityKey);
     if (data == null) return null;
     return CityModel.fromMap(jsonDecode(data));
+  }
+
+  void saveWeather(MainWeatherModel weather) {
+    _prefs.setString(_weatherKey, jsonEncode(weather.toMap()));
+  }
+
+  MainWeatherModel? getSavedWeather() {
+    final data = _prefs.getString(_weatherKey);
+    if (data == null) return null;
+    return MainWeatherModel.fromMap(jsonDecode(data));
   }
 }

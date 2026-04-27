@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:simple_weather/bloc/theme_cubit/theme_cubit.dart';
 import 'package:simple_weather/bloc/weather_cubit/weather_cubit.dart';
 import 'package:simple_weather/repositories/auth_repo.dart';
@@ -13,7 +12,6 @@ import 'package:simple_weather/theme/theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
   await setupDI();
   runApp(const MyApp());
 }

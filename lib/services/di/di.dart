@@ -16,15 +16,15 @@ Future<void> setupDI() async {
   await cityRepo.init();
 
   const secureStorage = FlutterSecureStorage();
+  final authRepo = AuthRepo(secureStorage);
+  await authRepo.init();
 
   getIt.registerSingleton<ThemeRepo>(themeRepo);
   getIt.registerSingleton<CityRepo>(cityRepo);
   getIt.registerSingleton<FlutterSecureStorage>(secureStorage);
+  getIt.registerSingleton<AuthRepo>(authRepo);
   getIt.registerSingleton<Dio>(Dio());
 
-  getIt.registerLazySingleton<AuthRepo>(
-    () => AuthRepo(getIt<FlutterSecureStorage>()),
-  );
   getIt.registerLazySingleton<StatsRepo>(() => StatsRepo(getIt<Dio>()));
   getIt.registerLazySingleton<WeatherRepo>(() => WeatherRepo(getIt<Dio>()));
   getIt.registerLazySingleton<GeoRepo>(() => GeoRepo(getIt<Dio>()));

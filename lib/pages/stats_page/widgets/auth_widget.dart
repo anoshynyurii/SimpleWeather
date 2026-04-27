@@ -57,13 +57,26 @@ class _AuthWidgetState extends State<AuthWidget> {
 
                       setState(() => _isLoading = true);
 
-                      await context.read<WeatherCubit>().saveTelegramId(
-                        _inputId,
-                      );
+                      final errorMessage = await context
+                          .read<WeatherCubit>()
+                          .saveTelegramId(
+                            _inputId,
+                          );
 
                       if (!mounted) return;
 
                       setState(() => _isLoading = false);
+
+                      if (errorMessage != null) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(errorMessage),
+                            backgroundColor: Colors.red.shade400,
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                      }
                     },
               child: _isLoading
                   ? const SizedBox(

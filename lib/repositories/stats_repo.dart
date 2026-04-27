@@ -1,16 +1,15 @@
 import 'dart:convert';
-
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:simple_weather/models/stats_model.dart';
 
 class StatsRepo {
   final Dio dio;
-  final String _scriptUrl = dotenv.env['SCRIPT_URL'] ?? '';
+  static const String _scriptUrl = String.fromEnvironment('SCRIPT_URL');
 
   StatsRepo(this.dio);
 
   Future<StatsModel> getStats(String userId) async {
+
     final response = await dio.get(
       _scriptUrl,
       queryParameters: {'userId': userId},

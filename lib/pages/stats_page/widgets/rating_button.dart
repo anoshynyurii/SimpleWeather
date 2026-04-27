@@ -25,7 +25,7 @@ class RatingButton extends StatelessWidget {
         ElevatedButton(
           onPressed: () async {
             final currentHour = DateTime.now().hour;
-            if (currentHour < 19) {
+            if (currentHour > 19) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Оцінити прогноз можна лише після 19:00'),

@@ -3,24 +3,33 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class AuthRepo {
   final FlutterSecureStorage _storage;
 
+  String? _telegramId;
+  String? _lastRatingDate;
+
   AuthRepo(this._storage);
 
-  Future<void> saveTelegramId(String id) async {
-    await _storage.write(key: 'telegram_id', value: id);
+  Future<void> init() async {
+    _telegramId = await _storage.read(key: 'telegram_id');
+    _lastRatingDate = await _storage.read(key: 'last_rating_date');
   }
 
-  Future<String?> getTelegramId() async {
-    return await _storage.read(key: 'telegram_id');
+  void saveTelegramId(String id) {
+    _telegramId = id;
+    _storage.write(key: 'telegram_id', value: id);
   }
 
-  Future<void> saveLastRatingDate() async {
+  String? getTelegramId() {
+    return _telegramId;
+  }
+
+  void saveLastRatingDate() {
     final today = DateTime.now().toIso8601String().substring(0, 10);
-    await _storage.write(key: 'last_rating_date', value: today);
+    _lastRatingDate = today;
+    _storage.write(key: 'last_rating_date', value: today);
   }
 
-  Future<bool> canRateToday() async {
+  bool canRateToday() {
     final today = DateTime.now().toIso8601String().substring(0, 10);
-    final lastDate = await _storage.read(key: 'last_rating_date');
-    return today != lastDate; 
+    return today != _lastRatingDate;
   }
 }
